@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[requires]
+python_version = "3.6.6"
+
+[packages]
+# Lib-dependencies already defined within `setup.py`
+
+[dev-packages]
+# Symlink to project root
+s3migrate = {editable = true,path = "."}
+# Linter
+flake8 = "*"
+mypy = "*"
+pydocstyle = "*"
+# Testing
+pytest = "*"
+pytest-cov = "*"
+pytest-mock = "*"
