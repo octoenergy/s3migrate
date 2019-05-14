@@ -11,6 +11,9 @@ s3 = s3fs.S3FileSystem()
 logger = logging.getLogger(__name__)
 
 
+__all__ = ["cp", "copy", "mv", "move", "rm", "remove"]
+
+
 def copy(fmt_in, fmt_out, dryrun=True):
     fmt_in = fmt_in.lstrip("s3://")
     fmt_out = fmt_out.lstrip("s3://")
