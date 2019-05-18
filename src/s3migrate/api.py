@@ -11,7 +11,7 @@ s3 = s3fs.S3FileSystem()
 logger = logging.getLogger(__name__)
 
 
-__all__ = ["cp", "copy", "mv", "move", "rm", "remove", "iter"]
+__all__ = ["cp", "copy", "mv", "move", "rm", "remove", "iter", "iterformats"]
 
 
 def copy(fmt_in, fmt_out, dryrun=True):
@@ -93,6 +93,23 @@ def iter(fmt_in):
     for path_in in tqdm(candidate_files, total=len(candidate_files)):
         if patterns.get_fmt_match_dict(path_in, fmt_in) is not None:
             yield path_in
+            found += 1
+        else:
+            pass
+    logger.info("Found %s out of %s files", found, len(candidate_files))
+
+
+def iterformats(fmt_in):
+    fmt_in = fmt_in.lstrip("s3://")
+    base_path = immutable_base(fmt_in)
+    logger.info("Looking for objects on %s", base_path)
+    candidate_files = s3.walk(base_path)
+    logger.info("Trying %s objects", len(candidate_files))
+    found = 0
+    for path_in in tqdm(candidate_files, total=len(candidate_files)):
+        fmt_dict = patterns.get_fmt_match_dict(path_in, fmt_in)
+        if fmt_dict is not None:
+            yield fmt_dict
             found += 1
         else:
             pass
