@@ -34,6 +34,7 @@ def test_fmt_string_to_regex_pattern(fmt_string, regex):
             {"key": "123", "filename": "part0.csv"},
         ),
         ("bucket/key={key}/{filename}", "bucket/key=123", None),
+        ("bucket/key={key}/file.ext", "bucket/key=123/file.ext.backup", None),
     ],
 )
 def test_get_fmt_match_dict(fmt_string, string, fmt_dict):

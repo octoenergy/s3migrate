@@ -10,7 +10,7 @@ def fmt_string_to_regex_pattern(fmt_string):
 
 
 def get_fmt_match_dict(string, fmt_string):
-    regex = fmt_string_to_regex_pattern(fmt_string)
+    regex = "^" + fmt_string_to_regex_pattern(fmt_string) + "$"
     match = re.match(regex, string)
     if not match:
         return None
