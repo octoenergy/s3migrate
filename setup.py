@@ -11,6 +11,7 @@ with open(REPO_ROOT / "README.md", encoding="utf-8") as f:
     README = f.read()
 
 REQUIREMENTS = [
+    "tentaclio",
     "tqdm",
     # S3 access
     "s3fs",

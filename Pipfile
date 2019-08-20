@@ -6,6 +6,9 @@ name = "pypi"
 [requires]
 python_version = "3.6.6"
 
+[pipenv]
+allow_prereleases = true
+
 [packages]
 # Lib-dependencies already defined within `setup.py`
 
@@ -20,3 +23,6 @@ pydocstyle = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
+pytest-lazy-fixture = "*"
+moto             = "*"
+boto3            = "*"
