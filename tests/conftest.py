@@ -4,7 +4,7 @@ from pytest_lazyfixture import lazy_fixture
 import moto
 import boto3
 
-import tentaclio as tio
+import fsspec
 
 
 @pytest.fixture
@@ -12,8 +12,8 @@ def s3_writable_url():
     """Returns a writable S3 URL."""
     test_bucket_name = "test_bucket"
     with moto.mock_s3():
-        client = boto3.client("s3")
-        client.create_bucket(Bucket=test_bucket_name)
+        conn = boto3.resource('s3', region_name='us-east-1')
+        conn.create_bucket(Bucket=test_bucket_name)
         url = f"s3://{test_bucket_name}"
         yield url
 
@@ -44,6 +44,6 @@ def file_tree(request):
     base_url = request.param
     tree = [base_url + "/" + sub_path for sub_path in TREE]
     for file_url in tree:
-        with tio.open(file_url, "w") as f:
+        with fsspec.open(file_url, "w") as f:
             f.write("bla")
     return base_url, tree
