@@ -1,6 +1,5 @@
 [![CircleCI](https://circleci.com/gh/octoenergy/s3migrate.svg?style=svg)](https://circleci.com/gh/octoenergy/s3migrate)
-[![codecov](https://codecov.io/gh/octoenergy/s3migrate/branch/feature%2Fadd-cod-cov/graph/badge.svg)](https://codecov.io/gh/octoenergy/s3migrate)
-
+[![codecov](https://codecov.io/gh/octoenergy/s3migrate/branch/master/graph/badge.svg)](https://codecov.io/gh/octoenergy/s3migrate)
 
 # s3migrate
 
