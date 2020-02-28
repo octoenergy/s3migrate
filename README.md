@@ -2,6 +2,7 @@
 [![codecov](https://codecov.io/gh/octoenergy/s3migrate/branch/master/graph/badge.svg)](https://codecov.io/gh/octoenergy/s3migrate)
 
 # s3migrate
+Bulk delete/copy/move files or modify Hive/Drill/Athena partitions using pythonic pattern matching 
 
 ## Example
 
