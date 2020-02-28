@@ -4,7 +4,7 @@ from pytest_lazyfixture import lazy_fixture
 import moto
 import boto3
 
-import tentaclio as tio
+import fsspec
 
 
 @pytest.fixture
@@ -44,6 +44,6 @@ def file_tree(request):
     base_url = request.param
     tree = [base_url + "/" + sub_path for sub_path in TREE]
     for file_url in tree:
-        with tio.open(file_url, "w") as f:
+        with fsspec.open(file_url, "w") as f:
             f.write("bla")
     return base_url, tree
