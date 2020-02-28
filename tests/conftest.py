@@ -8,7 +8,7 @@ import fsspec
 
 
 @pytest.fixture
-def s3_writable_url():
+def s3_writable_url(monkeypatch):
     """Returns a writable S3 URL."""
     test_bucket_name = "test_bucket"
     with moto.mock_s3():
