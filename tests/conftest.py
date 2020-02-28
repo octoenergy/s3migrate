@@ -12,8 +12,8 @@ def s3_writable_url():
     """Returns a writable S3 URL."""
     test_bucket_name = "test_bucket"
     with moto.mock_s3():
-        client = boto3.client("s3")
-        client.create_bucket(Bucket=test_bucket_name)
+        conn = boto3.resource('s3', region_name='us-east-1')
+        conn.create_bucket(Bucket=test_bucket_name)
         url = f"s3://{test_bucket_name}"
         yield url
 
