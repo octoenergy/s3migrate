@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 __all__ = ["cp", "copy", "mv", "move", "rm", "remove", "iter", "iterformats"]
 
 
-FS = s3FS.S3FileSystem()
+FS = s3fs.S3FileSystem()
 PROTOCOL = "s3"
 
 
