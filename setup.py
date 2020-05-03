@@ -13,6 +13,7 @@ with open(REPO_ROOT / "README.md", encoding="utf-8") as f:
 REQUIREMENTS = [
     "tqdm",
     "s3fs",
+    "parse"
 ]
 
 

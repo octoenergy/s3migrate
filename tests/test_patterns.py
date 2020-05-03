@@ -1,25 +1,6 @@
 import pytest
 
-from s3migrate.patterns import (
-    check_formats_compatible,
-    fmt_string_to_regex_pattern,
-    get_fmt_match_dict,
-    reformat
-)
-
-
-@pytest.mark.parametrize(
-    "fmt_string, regex",
-    [
-        ("key", "key"),
-        ("bucket/key", "bucket/key"),
-        ("{key_name}", "(?P<key_name>[^/]+)"),
-        ("bucket/key={key}/{filename}", "bucket/key=(?P<key>[^/]+)/(?P<filename>[^/]+)"),
-    ],
-)
-def test_fmt_string_to_regex_pattern(fmt_string, regex):
-    regex_out = fmt_string_to_regex_pattern(fmt_string)
-    assert regex_out == regex
+from s3migrate.patterns import check_formats_compatible, get_fmt_match_dict, reformat
 
 
 @pytest.mark.parametrize(
@@ -35,6 +16,8 @@ def test_fmt_string_to_regex_pattern(fmt_string, regex):
         ),
         ("bucket/key={key}/{filename}", "bucket/key=123", None),
         ("bucket/key={key}/file.ext", "bucket/key=123/file.ext.backup", None),
+        ("{key1}_{key2}", "12_34", {"key1": "12", "key2": "34"}),
+        ("bucket/{file}.{ext}", "bucket/image.jpg", {"file": "image", "ext": "jpg"}),
     ],
 )
 def test_get_fmt_match_dict(fmt_string, string, fmt_dict):
@@ -49,6 +32,7 @@ def test_get_fmt_match_dict(fmt_string, string, fmt_dict):
         ("{key}/{filename}", "key={key}/filename={filename}", True),
         ("{key}/{filename}", "key={key}/filename", False),
         ("{key}", "key={key2}", False),
+        ("{key}_{key}", "key={key}", True),
     ],
 )
 def test_check_formats_compatible(fmt1, fmt2, compat):
@@ -64,7 +48,8 @@ def test_check_formats_compatible(fmt1, fmt2, compat):
             "key={key}/filename={filename}",
             "bucket/file.ext",
             "key=bucket/filename=file.ext",
-        )
+        ),
+        ("{key}_{key}.{ext}", "key={key}/ext={ext}", "img_img.jpg", "key=img/ext=jpg"),
     ],
 )
 def test_reformat(fmt_in, fmt_out, string_in, string_out_expected):
