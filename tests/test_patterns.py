@@ -16,7 +16,7 @@ from s3migrate.patterns import check_formats_compatible, get_fmt_match_dict, ref
         ),
         ("bucket/key={key}/{filename}", "bucket/key=123", None),
         ("bucket/key={key}/file.ext", "bucket/key=123/file.ext.backup", None),
-        ("{key1}_{key2}", "12_34", {"key1": "12", "key2": "34"}),
+        ("{key1}_{key2:d}", "12_34", {"key1": "12", "key2": 34}),
         ("bucket/{file}.{ext}", "bucket/image.jpg", {"file": "image", "ext": "jpg"}),
     ],
 )
@@ -50,6 +50,7 @@ def test_check_formats_compatible(fmt1, fmt2, compat):
             "key=bucket/filename=file.ext",
         ),
         ("{key}_{key}.{ext}", "key={key}/ext={ext}", "img_img.jpg", "key=img/ext=jpg"),
+        ("{number:d}", "double={number:.2f}", "42", "double=42.00"),
     ],
 )
 def test_reformat(fmt_in, fmt_out, string_in, string_out_expected):
