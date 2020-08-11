@@ -33,8 +33,8 @@ test:
 format:
 	black -l 99 src
 	black -l 99 tests
-	isort -rc src
-	isort -rc tests
+	isort src
+	isort tests
 
 # Deployment
 package:
