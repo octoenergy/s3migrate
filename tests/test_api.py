@@ -1,6 +1,14 @@
 import s3migrate
 
 
+def test_yield_candidates(file_tree):
+    """Test that pruning is done early."""
+    base_url, files = file_tree
+    pattern = base_url + "/{ds}/type=three/{filename}.ext"
+    candidates = list(s3migrate.api._yield_candidates(pattern))
+    assert len(candidates) == 2
+
+
 def test_iterformats(file_tree):
     base_url, files = file_tree
     pattern = base_url + "/{ds}/type={type}/{filename}.ext"
