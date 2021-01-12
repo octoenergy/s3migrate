@@ -1,16 +1,15 @@
 import logging
+from typing import Sequence, Union
 
 import fsspec
-from tqdm.autonotebook import tqdm
 
 from . import patterns
-from .paths import immutable_base
 
 
 logger = logging.getLogger(__name__)
 
 
-__all__ = ["cp", "copy", "mv", "move", "rm", "remove", "iter", "iterformats"]
+__all__ = ["ls", "list", "cp", "copy", "mv", "move", "rm", "remove", "iter", "iterformats"]
 
 
 def _strip_prefix(path, prefix):
@@ -20,34 +19,64 @@ def _strip_prefix(path, prefix):
     return path
 
 
-def _get_fs_sep_prefix(fmt_in):
-    fs, _, _ = fsspec.get_fs_token_paths(fmt_in)
+def _get_fs_sep_prefix_paths(path: Union[str, Sequence[str]]):
+    """Identify separator and prefix for various filesystems.
+
+    In the case of local files, prefix is set to "" if original input path
+    is not prefixed with the file:// prefix.
+    """
+    fs, _, paths = fsspec.get_fs_token_paths(path)
     protocol = fs.protocol
     if not isinstance(protocol, str):
         protocol, *_ = protocol
     prefix = protocol + "://"
-    if protocol == "file" and not fmt_in.startswith(prefix):
+    if isinstance(path, str):
+        first_path = path
+    else:
+        first_path = path[0]
+    if protocol == "file" and not first_path.startswith(prefix):  # local file notation
         prefix = ""
     try:
         sep = fs.pathsep
     except AttributeError:
         sep = "/"
-    return fs, sep, prefix
+    return fs, sep, prefix, paths
 
 
-def _yield_candidates(fmt_in):
-    base_path = immutable_base(fmt_in)
-    logger.info("Looking for objects in %s", base_path)
-    fs, sep, prefix = _get_fs_sep_prefix(fmt_in)
-    for (dirpath, dirnames, filenames) in fs.walk(base_path):
-        for filename in filenames:
-            yield prefix + dirpath + sep + filename
+def _yield_candidates(path_fmt, fs=None, sep=None, prefix=None):
+    if not fs:
+        fs, sep, prefix, [path_fmt] = _get_fs_sep_prefix_paths(path_fmt)
+
+    parts = path_fmt.split(sep)
+    parts_immutable = ["{" not in part for part in parts]
+    try:
+        first_mutable = parts_immutable.index(False)
+    except ValueError:  # path has no templates
+        if fs.isfile(path_fmt):
+            yield prefix + path_fmt
+        return
+
+    immutable_base = sep.join(parts[:first_mutable])
+    this_fmt = sep.join(parts[: first_mutable + 1])
+    remaining_fmt = sep.join(parts[first_mutable + 1:])
+    if remaining_fmt:
+        remaining_fmt = sep + remaining_fmt
+    try:
+        entries = fs.ls(immutable_base)
+    except FileNotFoundError:
+        return
+    for entry in entries:
+        fmt_dict = patterns.get_fmt_match_dict(entry.rstrip(sep), this_fmt)
+        if fmt_dict is not None:
+            yield from _yield_candidates(
+                this_fmt.format(**fmt_dict) + remaining_fmt, fs=fs, sep=sep, prefix=prefix
+            )
 
 
 def iterformats(fmt_in):
     candidate_files = _yield_candidates(fmt_in)
     total, found = 0, 0
-    for path_in in tqdm(candidate_files):
+    for path_in in candidate_files:
         total += 1
         fmt_dict = patterns.get_fmt_match_dict(path_in, fmt_in)
         if fmt_dict is not None:
@@ -65,8 +94,8 @@ def iter(fmt_in):
 
 def _bin_op(fs_op_fn_getter, op_description: str, fmt_in, fmt_out, dryrun=True):
     """Shared functionality for move/copy."""
-    fs_in, sep, prefix_in = _get_fs_sep_prefix(fmt_in)
-    fs_out, sep, prefix_out = _get_fs_sep_prefix(fmt_out)
+    fs_in, sep, prefix_in, _ = _get_fs_sep_prefix_paths(fmt_in)
+    fs_out, sep, prefix_out, _ = _get_fs_sep_prefix_paths(fmt_out)
     if fs_out != fs_in:
         raise NotImplementedError("Can not copy between differen filesystems.")
     else:
@@ -123,7 +152,7 @@ def move(fmt_in, fmt_out, dryrun=True):
 
 
 def remove(fmt_in, dryrun=True):
-    fs, _, prefix_in = _get_fs_sep_prefix(fmt_in)
+    fs, _, prefix_in, _ = _get_fs_sep_prefix_paths(fmt_in)
 
     def rm(path_in):
         path_in = _strip_prefix(path_in, prefix_in)
@@ -136,6 +165,7 @@ def remove(fmt_in, dryrun=True):
             rm(path_in)
 
 
+ls = list = iter
 cp = copy
 mv = move
 rm = remove
