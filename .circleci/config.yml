@@ -6,8 +6,6 @@
 
 version: 2.1
 
-orbs:
-  codecov: codecov/codecov@1.0.4
 
 jobs:
   lint:
@@ -71,9 +69,6 @@ jobs:
       - run:
           name: Run unit tests
           command: make test
-
-      - codecov/upload:
-          file: ./coverage.xml
 
 
 workflows:
