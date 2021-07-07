@@ -10,6 +10,7 @@ from s3migrate.paths import immutable_base
         ("bucket/key", "bucket/key"),
         ("bucket/{key}", "bucket"),
         ("bucket/key={key}", "bucket"),
+        ("s3://bucket/key={key}", "s3://bucket"),
     ],
 )
 def test_fmt_string_to_regex_pattern(path_fmt, base):
