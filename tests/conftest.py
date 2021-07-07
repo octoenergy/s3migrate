@@ -1,10 +1,8 @@
+import boto3
+import fsspec
+import moto
 import pytest
 from pytest_lazyfixture import lazy_fixture
-
-import moto
-import boto3
-
-import fsspec
 
 
 @pytest.fixture
@@ -12,7 +10,7 @@ def s3_writable_url(monkeypatch):
     """Returns a writable S3 URL."""
     test_bucket_name = "test_bucket"
     with moto.mock_s3():
-        conn = boto3.resource('s3', region_name='us-east-1')
+        conn = boto3.resource("s3", region_name="us-east-1")
         conn.create_bucket(Bucket=test_bucket_name)
         url = f"s3://{test_bucket_name}"
         yield url
@@ -23,6 +21,13 @@ def local_writable_url(tmp_path):
     """Return a writable local URL."""
     path = str(tmp_path)
     url = f"file://{path}"
+    yield url
+
+
+@pytest.fixture
+def memory_writable_url():
+    """Return a writable in-memory URL."""
+    url = "memory://temp"
     yield url
 
 
@@ -37,7 +42,8 @@ TREE = [
 @pytest.fixture(
     params=[
         lazy_fixture("s3_writable_url"),
-        # lazy_fixture("local_writable_url")
+        lazy_fixture("local_writable_url"),
+        lazy_fixture("memory_writable_url"),
     ]
 )
 def file_tree(request):

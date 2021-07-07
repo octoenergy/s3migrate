@@ -49,6 +49,8 @@ The module provides the following commands:
 |`cp`/`copy`|2|copy (duplicate) all matched files to new location|
 |`mv`/`move`|2|move (rename) all matched files|
 |`rm`/`remove`|1| remove all matched files|
+|`ls`/`list`/`iter`|1| list all matched files|
+
 
 Eeach takes one or two patterns, as well as the `dryrun` argument.
 
@@ -57,7 +59,7 @@ Eeach takes one or two patterns, as well as the `dryrun` argument.
 ### General-purpose generators
 | command | usecase |
 | --- | --- |
-| `iter`| iterate over all matching filenames, e.g. to read each file |
+| `iter`/`ls`| iterate over all matching filenames, e.g. to read each file |
 | `iterformats` | iterate over all matched `format dictionaries`, e.g. to collect all Hive key values |
 
 `s3migrate.iter(pattern)` will yield file names `filename` matching `pattern`. This allows custom file processing logic downstream.
@@ -65,16 +67,4 @@ Eeach takes one or two patterns, as well as the `dryrun` argument.
 `s3migrate.iterformats(pattern)` will instead yield dictionaries `fmt_dict` such that `pattarn.format(**fmt_dict)` is equivalent to the matched `filename`.
 
 ## Dry run mode
-Dry run mode allows testing your patterns without performing any destructive operations.
-
-With `dryrun=True` (default), information about operations to be performed is logged at `INFO` and `DEBUG` level - make sure
-to set your logging accordingly, e.g. inside a Jupyter Notebook:
-
-
-```python
-import logging
-
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-logger.handlers = [logging.StreamHandler()]
-```
+Dry run mode allows testing your patterns without performing any destructive operations using `dryrun=True`.
